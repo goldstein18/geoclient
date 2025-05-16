@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard</title>
+  <link href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,800" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      background: #f8f9fa;
+    }
+
+    .main-content {
+      position: relative;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    #map {
+      height: 100%;
+      width: 100%;
+    }
+    
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      z-index: 1000;
+    }
+    
+    .modal-backdrop.active {
+      display: block;
+    }
+    
+    .modal-sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 330px;
+      height: 100vh;
+      background: #fff;
+      box-shadow: 0 0 2rem 0 rgba(136, 152, 170, .15);
+      z-index: 1001;
+      transition: left 0.3s ease;
+      display: flex;
+    }
+    
+    .modal-sidebar.active {
+      left: 0;
+    }
+    
+    .vertical-sidebar {
+      width: 80px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      padding: 1rem 0;
+      z-index: 1002;
+    }
+    
+    .sidebar-square {
+      width: 60px;
+      height: 60px;
+      margin: 0.5rem auto;
+      background: #e9ecef;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #758B61;
+      font-size: 1.5rem;
+    }
+    
+    .sidebar-square:hover {
+      background: #758B61;
+      color: white;
+    }
+    
+    .right-sidebar {
+      width: 250px;
+      background: #fff;
+      padding: 1rem;
+      z-index: 1002;
+    }
+    
+    .sidebar-rectangle {
+      width: 100%;
+      height: 80px;
+      margin: 0.5rem 0;
+      background: #e9ecef;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #758B61;
+      font-size: 1.2rem;
+    }
+    
+    .sidebar-rectangle:hover {
+      background: #758B61;
+      color: white;
+    }
+    
+    .left-panel {
+      position: fixed;
+      top: 50%;
+      left: 55%;
+      transform: translate(-50%, -50%);
+      width: 80%;
+      max-width: 500px;
+      max-height: 90vh;
+      padding: 2rem;
+      background: #fff;
+      box-shadow: 0 0 2rem 0 rgba(136, 152, 170, .15);
+      display: none;
+      z-index: 1002;
+      border-radius: 12px;
+      overflow-y: auto;
+    }
+    
+    .left-panel.active {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    
+    .input-group {
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .input-group label {
+      color: #758B61;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+    
+    .input-group input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+    
+    .input-group input:focus {
+      outline: none;
+      border-color: #758B61;
+      box-shadow: 0 0 0 2px rgba(117, 139, 97, 0.1);
+    }
+    
+    .input-group input::placeholder {
+      color: #adb5bd;
+    }
+
+    .panel-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      z-index: 1001;
+    }
+    
+    .panel-backdrop.active {
+      display: block;
+    }
+
+    .panel-rectangle {
+      width: 100%;
+      height: 200px;
+      background: #e9ecef;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #758B61;
+      font-size: 1.2rem;
+    }
+    
+    .panel-rectangle:hover {
+      background: #758B61;
+      color: white;
+    }
+
+    .close-button {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      width: 30px;
+      height: 30px;
+      background: #e9ecef;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #758B61;
+      font-size: 1.2rem;
+      z-index: 1003;
+    }
+
+    .close-button:hover {
+      background: #758B61;
+      color: white;
+    }
+
+    /* FAB Styles */
+    .fab {
+      position: fixed;
+      top: 30px;
+      left: 350px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background-color: #758B61;
+      color: white;
+      border: none;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      z-index: 1000;
+      transition: all 0.3s ease;
+      padding: 0; /* Ensure no padding affects the icon */
+    }
+
+    .fab:hover {
+      background-color: #758B61;
+      transform: scale(1.1);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background-color: white;
+      padding: 25px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+
+    .modal-header {
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      color: #333;
+      font-size: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #555;
+    }
+
+    .form-control {
+      width: 95%;
+      padding: 0.75rem;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: #758B61;
+      box-shadow: 0 0 0 2px rgba(117, 139, 97, 0.1);
+    }
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 25px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .btn-secondary {
+      background-color: #f5f5f5;
+      color: #333;
+    }
+
+    .btn-secondary:hover {
+      background-color: #e0e0e0;
+    }
+
+    .btn-primary {
+      background-color: #758B61;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: #758B61;
+    }
+
+    /* Image Upload Overlay */
+    .upload-overlay {
+      position: fixed;
+      top: 0;
+      left: 80px; /* Account for the vertical sidebar */
+      right: 0;
+      bottom: 0;
+      background: white;
+      z-index: 1000; /* Lower than sidebar z-index */
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .upload-container {
+      max-width: 500px;
+      width: 100%;
+      padding: 40px;
+      border: 2px dashed #e0e0e0;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .upload-container:hover {
+      border-color: #758B61;
+      background-color: #f8f9fa;
+    }
+
+    .upload-icon {
+      font-size: 64px;
+      color: #758B61;
+      margin-bottom: 20px;
+    }
+
+    .upload-text {
+      font-size: 1.25rem;
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    .upload-hint {
+      color: #888;
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    .close-upload {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #f5f5f5;
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.5rem;
+      color: #555;
+      z-index: 1001; /* Above the overlay */
+    }
+
+    .close-upload:hover {
+      background: #e0e0e0;
+    }
+  </style>
+</head>
+<body>
+  <div class="main-content">
+    <!-- Map Container -->
+    <div id="map"></div>
+
+    <!-- Modal Backdrop -->
+    <div class="modal-backdrop" id="modalBackdrop"></div>
+
+    <!-- Panel Backdrop -->
+    <div class="panel-backdrop" id="panelBackdrop"></div>
+
+    <!-- Modal Sidebar -->
+    <div class="modal-sidebar" id="modalSidebar">
+      <!-- Vertical Sidebar -->
+      <div class="vertical-sidebar">
+        <div class="sidebar-square" onclick="toggleRightSidebar()">1</div>
+        <div class="sidebar-square">2</div>
+        <div class="sidebar-square">3</div>
+        <div class="sidebar-square">4</div>
+      </div>
+      
+      <!-- Right Sidebar -->
+      <div class="right-sidebar" id="rightSidebar">
+        <div class="sidebar-rectangle" onclick="toggleLeftPanel()">Cuenta</div>
+        <div class="sidebar-rectangle">Nombre de cuenta</div>
+        <div class="sidebar-rectangle">Equipo de trabajo</div>
+        <div class="sidebar-rectangle" onclick="window.location.href='map.html'">Ver imagen satelital</div>
+      </div>
+    </div>
+
+    <!-- Left Panel -->
+    <div class="left-panel" id="leftPanel">
+      <div class="input-group">
+        <label for="email">Correo electrónico</label>
+        <input type="email" id="email" placeholder="Ingrese su correo electrónico">
+      </div>
+      <div class="input-group">
+        <label for="password">Contraseña</label>
+        <input type="password" id="password" placeholder="Ingrese su contraseña">
+      </div>
+      <div class="input-group">
+        <label for="language">Idioma</label>
+        <input type="text" id="language" placeholder="Seleccione su idioma">
+      </div>
+      <div class="input-group">
+        <label for="units">Sistema de unidades</label>
+        <input type="text" id="units" placeholder="Seleccione su sistema de unidades">
+      </div>
+      <div class="input-group">
+        <label for="delete">Eliminar cuenta</label>
+        <input type="text" id="delete" placeholder="Confirme para eliminar su cuenta">
+      </div>
+      <div class="input-group">
+        <label for="fiscal">Información fiscal</label>
+        <input type="text" id="fiscal" placeholder="Ingrese su información fiscal">
+      </div>
+      <div class="input-group">
+        <label for="payment">Método de pago</label>
+        <input type="text" id="payment" placeholder="Seleccione su método de pago">
+      </div>
+      <div class="input-group">
+        <label for="content">Contenido adicional</label>
+        <input type="text" id="content" placeholder="Ingrese contenido adicional">
+      </div>
+    </div>
+
+    <!-- Close Button -->
+    <button class="close-button" onclick="closeModal()">×</button>
+    
+    <!-- Floating Action Button -->
+    <button class="fab" id="addFieldFab" title="Crear nuevo campo">
+      <i class="fas fa-plus" style="font-size: 1.5rem;"></i>
+    </button>
+    
+    <!-- Image Upload Overlay -->
+    <div class="upload-overlay" id="uploadOverlay">
+      <button class="close-upload" id="closeUpload">×</button>
+      <div class="upload-container" id="uploadContainer">
+        <div class="upload-icon">
+          <i class="fas fa-file-upload"></i>
+        </div>
+        <div class="upload-text">Arrastra y suelta tus imágenes aquí</div>
+        <div class="upload-hint">o haz clic para seleccionar archivos</div>
+        <input type="file" id="fileInput" multiple accept="image/*">
+      </div>
+    </div>
+    
+    <!-- New Field Modal -->
+    <div id="newFieldModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Crear nuevo campo</h2>
+        </div>
+        <div class="form-group">
+          <label for="fieldName">Nombre del campo</label>
+          <input type="text" id="fieldName" class="form-control" placeholder="Ingrese el nombre del campo">
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" id="cancelBtn">Cancelar</button>
+          <button class="btn btn-primary" id="createBtn">Crear</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    // Initialize OpenStreetMap
+    function initMap() {
+      const map = L.map('map').setView([-34.397, 150.644], 8);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
+    }
+
+    // Initialize map when page loads
+    window.onload = initMap;
+
+    function toggleRightSidebar() {
+      const modalSidebar = document.getElementById('modalSidebar');
+      const modalBackdrop = document.getElementById('modalBackdrop');
+      modalSidebar.classList.toggle('active');
+      modalBackdrop.classList.toggle('active');
+    }
+    
+    function toggleLeftPanel() {
+      const leftPanel = document.getElementById('leftPanel');
+      const panelBackdrop = document.getElementById('panelBackdrop');
+      leftPanel.classList.toggle('active');
+      panelBackdrop.classList.toggle('active');
+    }
+
+    function closeModal() {
+      const modalSidebar = document.getElementById('modalSidebar');
+      const modalBackdrop = document.getElementById('modalBackdrop');
+      const leftPanel = document.getElementById('leftPanel');
+      const panelBackdrop = document.getElementById('panelBackdrop');
+      
+      modalSidebar.classList.remove('active');
+      modalBackdrop.classList.remove('active');
+      leftPanel.classList.remove('active');
+      panelBackdrop.classList.remove('active');
+    }
+
+    // Close modal when clicking backdrop
+    document.getElementById('modalBackdrop').addEventListener('click', closeModal);
+    document.getElementById('panelBackdrop').addEventListener('click', closeModal);
+
+    // Image Upload Functionality
+    const uploadOverlay = document.getElementById('uploadOverlay');
+    const closeUploadBtn = document.getElementById('closeUpload');
+    const uploadContainer = document.getElementById('uploadContainer');
+    const fileInput = document.getElementById('fileInput');
+    const sidebarSquare2 = document.querySelector('.sidebar-square:nth-child(2)');
+
+    // Open upload overlay when clicking sidebar square 2
+    sidebarSquare2.addEventListener('click', function() {
+      uploadOverlay.style.display = 'flex';
+      document.body.style.overflow = 'hidden'; // Prevent scrolling
+    });
+
+    // Close upload overlay
+    function closeUploadOverlay() {
+      uploadOverlay.style.display = 'none';
+      document.body.style.overflow = ''; // Re-enable scrolling
+    }
+
+    closeUploadBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      closeUploadOverlay();
+    });
+
+    // Close overlay when clicking outside the upload container
+    uploadOverlay.addEventListener('click', function(e) {
+      if (e.target === uploadOverlay) {
+        closeUploadOverlay();
+      }
+    });
+
+    // Handle file selection
+    uploadContainer.addEventListener('click', function() {
+      fileInput.click();
+    });
+
+    // Handle file selection
+    fileInput.addEventListener('change', function(e) {
+      const files = e.target.files;
+      if (files.length > 0) {
+        // Here you can handle the uploaded files
+        console.log('Files selected:', files);
+        alert(`Se han seleccionado ${files.length} archivo(s)`);
+        // You can add code here to process the uploaded files
+      }
+    });
+
+    // Handle drag and drop
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      uploadContainer.addEventListener(eventName, preventDefaults, false);
+      document.body.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+      uploadContainer.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      uploadContainer.addEventListener(eventName, unhighlight, false);
+    });
+
+    function highlight() {
+      uploadContainer.style.borderColor = '#4CAF50';
+      uploadContainer.style.backgroundColor = '#f0f9f0';
+    }
+
+    function unhighlight() {
+      uploadContainer.style.borderColor = '#e0e0e0';
+      uploadContainer.style.backgroundColor = '';
+    }
+
+    // Handle dropped files
+    uploadContainer.addEventListener('drop', handleDrop, false);
+    
+    // Close on escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && uploadOverlay.style.display === 'flex') {
+        closeUploadOverlay();
+      }
+    });
+
+    function handleDrop(e) {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      
+      if (files.length > 0) {
+        // Here you can handle the dropped files
+        console.log('Files dropped:', files);
+        alert(`Se han soltado ${files.length} archivo(s)`);
+        // You can add code here to process the dropped files
+      }
+    }
+    
+    // New Field Modal Functionality
+    const newFieldModal = document.getElementById('newFieldModal');
+    const addFieldBtn = document.getElementById('addFieldFab');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const createBtn = document.getElementById('createBtn');
+    const fieldNameInput = document.getElementById('fieldName');
+
+    // Open modal when FAB is clicked
+    addFieldBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      newFieldModal.style.display = 'flex';
+      fieldNameInput.focus();
+    });
+
+    // Close modal when cancel button is clicked
+    cancelBtn.addEventListener('click', function() {
+      newFieldModal.style.display = 'none';
+      fieldNameInput.value = '';
+    });
+
+    // Handle create button click
+    createBtn.addEventListener('click', function() {
+      const fieldName = fieldNameInput.value.trim();
+      if (fieldName) {
+        // Here you can add code to handle the creation of a new field
+        alert(`Campo "${fieldName}" creado exitosamente!`);
+        newFieldModal.style.display = 'none';
+        fieldNameInput.value = '';
+      } else {
+        alert('Por favor ingrese un nombre para el campo');
+      }
+    });
+
+    // Close modal when clicking outside the modal content
+    window.addEventListener('click', function(event) {
+      if (event.target === newFieldModal) {
+        newFieldModal.style.display = 'none';
+        fieldNameInput.value = '';
+      }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape' && newFieldModal.style.display === 'flex') {
+        newFieldModal.style.display = 'none';
+        fieldNameInput.value = '';
+      }
+    });
+  </script>
+</body>
+</html>
+
