@@ -38,14 +38,14 @@
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
       backdrop-filter: blur(8px);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      max-width: 600px;
       width: 90%;
+      max-width: 600px;
       margin: 0 auto;
       animation: fadeIn 0.5s ease-in-out;
     }
 
     .update-message h1 {
-      font-size: 3rem;
+      font-size: clamp(2rem, 5vw, 3rem);
       margin-bottom: 2.5rem;
       font-weight: 700;
       background: linear-gradient(135deg, #1a1a1a, #333);
@@ -59,6 +59,7 @@
       gap: 2.5rem;
       justify-content: center;
       margin: 2rem 0;
+      flex-wrap: wrap;
     }
 
     .time-unit {
@@ -71,6 +72,8 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
       transition: all 0.3s ease;
       border: 1px solid rgba(0, 0, 0, 0.1);
+      flex: 1;
+      min-width: 100px;
     }
 
     .time-unit:hover {
@@ -79,17 +82,43 @@
     }
 
     .time-unit span {
-      font-size: 2.5rem;
+      font-size: clamp(2rem, 5vw, 2.5rem);
       font-weight: 600;
       margin-bottom: 0.5rem;
       line-height: 1;
     }
 
     .time-unit small {
-      font-size: 1rem;
+      font-size: clamp(0.8rem, 2vw, 1rem);
       color: #666;
       font-weight: 500;
       letter-spacing: 0.5px;
+    }
+
+    @media (max-width: 768px) {
+      .countdown {
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+      }
+
+      .time-unit {
+        flex: 0 1 100%;
+        padding: 1.5rem;
+        min-width: 100%;
+      }
+
+      .update-message h1 {
+        font-size: clamp(1.5rem, 5vw, 2.5rem);
+      }
+
+      .time-unit span {
+        font-size: clamp(1.5rem, 5vw, 2rem);
+      }
+
+      .time-unit small {
+        font-size: clamp(0.7rem, 2vw, 0.9rem);
+      }
     }
 
     @keyframes fadeIn {
