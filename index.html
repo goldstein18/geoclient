@@ -1,3 +1,4 @@
+@@ -0,0 +1,727 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -15,151 +16,139 @@
       background: #f8f9fa;
     }
 
-    .update-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-      overflow: hidden;
-      padding: 2rem;
-    }
-
-    .update-message {
-      text-align: center;
-      color: #1a1a1a;
-      background: rgba(255, 255, 255, 0.95);
-      padding: 2rem;
-      border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      width: 100%;
-      max-width: 600px;
-      margin: 0 auto;
-      animation: fadeIn 0.5s ease-in-out;
-    }
-
-    .update-message h1 {
-      font-size: clamp(2rem, 5vw, 3rem);
-      margin-bottom: 2.5rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, #1a1a1a, #333);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      letter-spacing: -1px;
-    }
-
-    .countdown {
-      display: flex;
-      gap: 2rem;
-      justify-content: center;
-      margin: 2rem 0;
-      flex-wrap: wrap;
-    }
-
-    .time-unit {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 1.5rem;
-      background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-      transition: all 0.3s ease;
-      border: 1px solid rgba(0, 0, 0, 0.1);
-      flex: 1;
-      min-width: 100px;
-    }
-
-    .time-unit:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-    }
-
-    .time-unit span {
-      font-size: clamp(2rem, 5vw, 2.5rem);
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      line-height: 1;
-    }
-
-    .time-unit small {
-      font-size: clamp(0.8rem, 2vw, 1rem);
-      color: #666;
-      font-weight: 500;
-      letter-spacing: 0.5px;
-    }
-
-    @media (max-width: 768px) {
-      .update-overlay {
-        padding: 1rem;
-      }
-
-      .update-message {
-        padding: 1.5rem;
-      }
-
-      .countdown {
-        flex-direction: column;
-        align-items: center;
-        gap: 1.5rem;
-        margin: 1.5rem 0;
-      }
-
-      .time-unit {
-        flex: 0 1 100%;
-        padding: 1.25rem;
-        min-width: 100%;
-      }
-
-      .update-message h1 {
-        font-size: clamp(1.5rem, 5vw, 2.5rem);
-      }
-
-      .time-unit span {
-        font-size: clamp(1.5rem, 5vw, 2rem);
-      }
-
-      .time-unit small {
-        font-size: clamp(0.7rem, 2vw, 0.9rem);
-      }
-    }
-
-    @media (max-width: 480px) {
-      .update-message h1 {
-        font-size: clamp(1.25rem, 5vw, 2rem);
-      }
-
-      .time-unit span {
-        font-size: clamp(1.25rem, 5vw, 1.75rem);
-      }
-
-      .time-unit small {
-        font-size: clamp(0.65rem, 2vw, 0.85rem);
-      }
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
     .main-content {
       position: relative;
       height: 100vh;
       width: 100vw;
+    }
+
+    .timeline {
+      position: absolute;
+      bottom: 85px;
+      left: 600px;
+      background: white;
+
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      width: 50%;
+      z-index: 10000;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .timeline-item {
+      flex: 1;
+      text-align: center;
+      padding: 0;
+      border-right: 1px solid #eee;
+    }
+
+    .timeline-item {
+      flex: 1;
+      text-align: center;
+      padding: 0 15px;
+      border-right: 1px solid #eee;
+    }
+
+    .timeline-item:last-child {
+      border-right: none;
+    }
+
+    .timeline-item h3 {
+      color: #000;
+      font-weight: 700;
+      margin-bottom: 10px;
+      font-size: 1rem;
+    }
+
+    .dates {
+      display: flex;
+      gap: 4px;
+      justify-content: center;
+    }
+
+    .dates span {
+      color: #000;
+      font-size: 0.7rem;
+      padding: 3px 6px;
+      background: #f5f5f5;
+      border-radius: 4px;
+      display: inline-block;
+      min-width: 35px;
+      text-align: center;
+    }
+
+    .timeline-item {
+   
+      border-bottom: 1px solid #eee;
+      padding-bottom: 15px;
+    }
+
+    .timeline-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .timeline-item h3 {
+      color: #000;
+      font-weight: 700;
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+    }
+
+    .dates {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .dates span {
+      color: #000;
+      font-size: 0.9rem;
+
+      background: #f5f5f5;
+      border-radius: 4px;
+    }
+
+    .bottom-left-icons {
+      position: absolute;
+      bottom: 80px;
+      left: 350px; /* Adjust based on sidebar width */
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      z-index: 1000;
+    }
+
+    .icon-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    .icon-button {
+      background: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transition: all 0.2s ease;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .icon-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .icon-button i {
+      color: #000;
+      font-size: 1.2rem;
     }
 
     #map {
@@ -569,28 +558,81 @@
   </style>
 </head>
 <body>
-  <div class="update-overlay">
-    <div class="update-message">
-      <h1>Update in progress</h1>
-      <div class="countdown">
-        <div class="time-unit" id="hours">
-          <span>03</span>
-          <small>Hours</small>
-        </div>
-        <div class="time-unit" id="minutes">
-          <span>30</span>
-          <small>Minutes</small>
-        </div>
-        <div class="time-unit" id="seconds">
-          <span>00</span>
-          <small>Seconds</small>
-        </div>
-      </div>
-    </div>
-  </div>
   <div class="main-content">
     <!-- Map Container -->
     <div id="map"></div>
+
+    <!-- Timeline -->
+    <div class="timeline">
+      <div class="timeline-item">
+        <h3>Noviembre</h3>
+        <div class="dates">
+          <span>12/10</span>
+          <span>15/10</span>
+          <span>18/10</span>
+          <span>21/10</span>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <h3>Diciembre</h3>
+        <div class="dates">
+          <span>12/12</span>
+          <span>15/12</span>
+          <span>18/12</span>
+          <span>21/12</span>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <h3>Enero</h3>
+        <div class="dates">
+          <span>12/1</span>
+          <span>15/1</span>
+          <span>18/1</span>
+          <span>21/1</span>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <h3>Febrero</h3>
+        <div class="dates">
+          <span>12/2</span>
+          <span>15/2</span>
+          <span>18/2</span>
+          <span>21/2</span>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <h3>Marzo</h3>
+        <div class="dates">
+          <span>12/3</span>
+          <span>15/3</span>
+          <span>18/3</span>
+          <span>21/3</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Left Icons -->
+    <div class="bottom-left-icons">
+      <div class="icon-group">
+        <button class="icon-button" id="mountainIcon">
+          <i class="fas fa-mountain"></i>
+        </button>
+        <button class="icon-button" id="rulerIcon">
+          <i class="fas fa-ruler"></i>
+        </button>
+      </div>
+      <div class="icon-group">
+        <button class="icon-button" id="vitalsIcon">
+          <i class="fas fa-heartbeat"></i>
+        </button>
+        <button class="icon-button" id="imageIcon">
+          <i class="fas fa-image"></i>
+        </button>
+        <button class="icon-button" id="exclamationIcon">
+          <i class="fas fa-exclamation"></i>
+        </button>
+      </div>
+    </div>
 
     <!-- Modal Backdrop -->
     <div class="modal-backdrop" id="modalBackdrop"></div>
@@ -703,10 +745,7 @@
     }
 
     // Initialize map when page loads
-    window.onload = function() {
-      initMap();
-      startCountdown();
-    };
+    window.onload = initMap;
 
     function toggleRightSidebar() {
       const modalSidebar = document.getElementById('modalSidebar');
@@ -737,46 +776,6 @@
     // Close modal when clicking backdrop
     document.getElementById('modalBackdrop').addEventListener('click', closeModal);
     document.getElementById('panelBackdrop').addEventListener('click', closeModal);
-
-    function startCountdown() {
-      // Get current time in Mexico City (UTC-6)
-      const now = new Date();
-      const targetTime = new Date();
-      
-      // Set target time to 10:30 PM today
-      targetTime.setHours(22, 45, 0, 0);  // 10:30 PM
-      
-      // If current time is past 10:30 PM, set target for tomorrow
-      if (now > targetTime) {
-        targetTime.setDate(targetTime.getDate() + 1);
-      }
-      
-      // Calculate initial seconds
-      let totalSeconds = Math.floor((targetTime - now) / 1000);
-      
-      function updateTimer() {
-        // Update the time
-        const now = new Date();
-        const secondsLeft = Math.floor((targetTime - now) / 1000);
-        
-        const hours = Math.floor(secondsLeft / 3600);
-        const minutes = Math.floor((secondsLeft % 3600) / 60);
-        const seconds = secondsLeft % 60;
-
-        document.getElementById('hours').querySelector('span').textContent = hours.toString().padStart(2, '0');
-        document.getElementById('minutes').querySelector('span').textContent = minutes.toString().padStart(2, '0');
-        document.getElementById('seconds').querySelector('span').textContent = seconds.toString().padStart(2, '0');
-
-        if (secondsLeft <= 0) {
-          clearInterval(timerInterval);
-          // For example, you could redirect or show a different message here
-        }
-      }
-
-      // Update every second
-      const timerInterval = setInterval(updateTimer, 1000);
-      updateTimer(); // Initial call to display the timer immediately
-    }
 
     // Image Upload Functionality
     const uploadOverlay = document.getElementById('uploadOverlay');
@@ -927,4 +926,3 @@
   </script>
 </body>
 </html>
-
