@@ -644,15 +644,26 @@
     <div class="modal-sidebar" id="modalSidebar">
       <!-- Vertical Sidebar -->
       <div class="vertical-sidebar">
-        <div class="sidebar-square" onclick="toggleRightSidebar()">1</div>
-        <div class="sidebar-square">2</div>
-        <div class="sidebar-square">3</div>
-        <div class="sidebar-square">4</div>
+        <div class="sidebar-square" onclick="toggleLeftPanel()">
+          <i class="fas fa-cog"></i>
+        </div>
+        <div class="sidebar-square">
+          <i class="fas fa-plus"></i>
+        </div>
+        <div class="sidebar-square">
+          <i class="fas fa-globe"></i>
+        </div>
+        <div class="sidebar-square">
+          <i class="fas fa-clock"></i>
+        </div>
+        <div class="sidebar-square">
+          <i class="fas fa-pencil-alt"></i>
+        </div>
       </div>
       
       <!-- Right Sidebar -->
       <div class="right-sidebar" id="rightSidebar">
-        <div class="sidebar-rectangle" onclick="toggleLeftPanel()">Cuenta</div>
+        <div class="sidebar-rectangle"">Cuenta</div>
         <div class="sidebar-rectangle">Nombre de cuenta</div>
         <div class="sidebar-rectangle">Equipo de trabajo</div>
         <div class="sidebar-rectangle" onclick="window.location.href='map.html'">Ver imagen satelital</div>
